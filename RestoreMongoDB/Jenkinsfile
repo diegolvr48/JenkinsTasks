@@ -3,7 +3,7 @@ pipeline {
 
     parameters {
         string(name: 'KEY_BACKUP_ENV', defaultValue: 'hey.zip', description: '')
-        choice(name: 'MONGO_DB', choices: 'hey-dev,hey-qa', description: 'Selecciona la base de datos')
+        choice(name: 'MONGO_DB', choices: ['hey-dev', 'hey-qa'], description: 'Selecciona la base de datos', )
         string(name: 'MONGO_HOST', defaultValue: 'develop.uf9uoog.mongodb.net', description: '')
     }
 
