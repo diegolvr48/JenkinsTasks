@@ -43,8 +43,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'mongodbuser', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USER')]) {
                     script {
                         sh 'unzip /tmp/${KEY_BACKUP_ENV} -d /tmp/${FOLDER_UNZIP_BACKUP}'
-                        sh 'ls -la /tmp/${FOLDER_UNZIP_BACKUP}'
-                        sh 'mongorestore --uri="mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} /tmp/${FOLDER_UNZIP_BACKUP}  --gzip --drop'
+                        sh 'mongorestore --uri="mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --nsInclude="${MONGO_DB}.*" /tmp/${FOLDER_UNZIP_BACKUP}  --gzip --drop'
                     }
                 }
             }
