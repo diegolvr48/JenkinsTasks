@@ -52,7 +52,7 @@ pipeline {
 
     post {
         always {
-            sh 'rm -r /tmp/${FOLDER_BACKUP}_${KEY_BACKUP_ENV} /tmp/${FOLDER_BACKUP} | true'
+            sh 'rm -r /tmp/${FOLDER_BACKUP}_${KEY_BACKUP_ENV} /tmp/${FOLDER_BACKUP} || true'
         }
     }
 }

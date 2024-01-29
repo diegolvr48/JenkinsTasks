@@ -52,7 +52,7 @@ pipeline {
 
     post {
         always {
-            sh 'rm -r /tmp/${KEY_BACKUP_ENV} /tmp/${FOLDER_UNZIP_BACKUP} | true' 
+            sh 'rm -r /tmp/${KEY_BACKUP_ENV} /tmp/${FOLDER_UNZIP_BACKUP} || true' 
         }
     }
 }
