@@ -18,21 +18,19 @@ pipeline {
             }
         }
 
-        stage('unzip backup') {
-            steps {
-                sh 'unzip ~/backups/${KEY_BACKUP_ENV}'
-            }
-        }
-
         stage('restore') {
             steps {
-                sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} ~/backups/ --gzip'
+                script {
+                    sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} ~/backups/${KEY_BACKUP_ENV} --gzip --drop'
+                }
             }
         }
 
         stage('Delete backup') {
             steps {
-                sh 'rm -r ~/backups'
+                script {
+                    sh 'rm -r ~/backups'
+                }
             }
         }
     }
