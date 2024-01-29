@@ -7,6 +7,10 @@ pipeline {
         string(name: 'MONGO_HOST', defaultValue: 'develop.uf9uoog.mongodb.net', description: '')
     }
 
+    environment {
+        FOLDER_UNZIP_BACKUP = new Date().format("yyyyMMddHHmmss")
+    }
+
     stages {
         stage('Prepare env') {
             steps {
@@ -34,7 +38,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'mongodbuser', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USER')]) {
                     script {
-                        sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} /tmp/${KEY_BACKUP_ENV} --gzip --drop'
+                        sh 'unzip /tmp/${KEY_BACKUP_ENV} /tmp/${FOLDER_UNZIP_BACKUP}'
+                        sh 'mongorestore --uri="mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} /tmp/${FOLDER_UNZIP_BACKUP}  --gzip --drop'
                     }
                 }
             }
@@ -43,7 +48,7 @@ pipeline {
         stage('Delete backup') {
             steps {
                 script {
-                    sh 'rm -r /tmp/${KEY_BACKUP_ENV}'
+                    sh 'rm -r /tmp/${KEY_BACKUP_ENV} /tmp/${FOLDER_UNZIP_BACKUP}'
                 }
             }
         }
