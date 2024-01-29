@@ -19,19 +19,19 @@ pipeline {
         }
 
         stage('unzip backup') {
-            script {
+            steps {
                 sh 'unzip ~/backups/${KEY_BACKUP_ENV}'
             }
         }
 
         stage('restore') {
-            script {
+            steps {
                 sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} ~/backups/ --gzip'
             }
         }
 
         stage('Delete backup') {
-            script {
+            steps {
                 sh 'rm -r ~/backups'
             }
         }
