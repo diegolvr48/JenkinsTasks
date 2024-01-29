@@ -11,8 +11,8 @@ pipeline {
         stage('Prepare env') {
             steps {
                 script {
-                    sh 'sudo apt-get update -y'
-                    sh 'sudo apt-get install -y mongodb-org-tools'
+                    sh 'apt-get update -y'
+                    sh 'apt-get install -y mongodb-org-tools'
                     sh 'mongorestore --version'
                 }
             }
