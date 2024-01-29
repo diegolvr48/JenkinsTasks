@@ -11,21 +11,29 @@ pipeline {
 
     stages {
         stage('Download backup') {
-            withAWS(credentials: 'awscredentials') {
-                s3Download(file: KEY_BACKUP_ENV, bucket: 'backups', path:'~/backups')
+            steps {
+                withAWS(credentials: 'awscredentials') {
+                    s3Download(file: KEY_BACKUP_ENV, bucket: 'backups', path:'~/backups')
+                }
             }
         }
 
         stage('unzip backup') {
-        sh 'unzip ~/backups/${KEY_BACKUP_ENV}'
+            script {
+                sh 'unzip ~/backups/${KEY_BACKUP_ENV}'
+            }
         }
 
         stage('restore') {
-        sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} ~/backups/ --gzip'
+            script {
+                sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} ~/backups/ --gzip'
+            }
         }
 
         stage('Delete backup') {
-        sh 'rm -r ~/backups'
+            script {
+                sh 'rm -r ~/backups'
+            }
         }
     }
 }
