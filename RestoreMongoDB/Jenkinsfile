@@ -3,17 +3,15 @@ pipeline {
 
     parameters {
         string(name: 'KEY_BACKUP_ENV', defaultValue: 'hey.zip', description: '')
+        choice(name: 'MONGO_DB', choices: 'hey-dev,hey-qa', description: 'Selecciona la base de datos')
         string(name: 'MONGO_HOST', defaultValue: 'develop.uf9uoog.mongodb.net', description: '')
-        string(name: 'MONGO_USER', defaultValue: 'heyDev', description: '')
-        string(name: 'MONGO_PASSWORD', defaultValue: '', description: '')
-        string(name: 'MONGO_DB', defaultValue: 'hey-dev', description: '')
     }
 
     stages {
         stage('Download backup') {
             steps {
                 script {
-                    withAWS(credentials: 'awscredentials') {
+                    withAWS(credentials: 'awscredentials', region: 'us-east-2') {
                         s3Download(file: KEY_BACKUP_ENV, bucket: 'backups', path:'~/backups')
                     }
                 }
@@ -22,8 +20,10 @@ pipeline {
 
         stage('restore') {
             steps {
-                script {
-                    sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} ~/backups/${KEY_BACKUP_ENV} --gzip --drop'
+                withCredentials([usernamePassword(credentialsId: 'mongodbuser', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USER')]) {
+                    script {
+                        sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} ~/backups/${KEY_BACKUP_ENV} --gzip --drop'
+                    }
                 }
             }
         }
