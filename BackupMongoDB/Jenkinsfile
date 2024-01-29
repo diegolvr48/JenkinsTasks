@@ -39,7 +39,7 @@ pipeline {
             }
         }
 
-        stage('Download backup') {
+        stage('Upload backup') {
             steps {
                 script {
                     withAWS(credentials: 'awscredentials', region: 'us-east-2') {

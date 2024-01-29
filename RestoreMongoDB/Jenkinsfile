@@ -48,14 +48,6 @@ pipeline {
                 }
             }
         }
-
-        stage('Delete backup') {
-            steps {
-                script {
-                    
-                }
-            }
-        }
     }
 
     post {
