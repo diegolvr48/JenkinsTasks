@@ -12,8 +12,10 @@ pipeline {
     stages {
         stage('Download backup') {
             steps {
-                withAWS(credentials: 'awscredentials') {
-                    s3Download(file: KEY_BACKUP_ENV, bucket: 'backups', path:'~/backups')
+                script {
+                    withAWS(credentials: 'awscredentials') {
+                        s3Download(file: KEY_BACKUP_ENV, bucket: 'backups', path:'~/backups')
+                    }
                 }
             }
         }
