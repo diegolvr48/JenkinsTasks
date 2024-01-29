@@ -12,7 +12,7 @@ pipeline {
             steps {
                 script {
                     withAWS(credentials: 'awscredentials', region: 'us-east-2') {
-                        s3Download(file: "${KEY_BACKUP_ENV}", bucket: 'sellia-backups', path: '/tmp/${KEY_BACKUP_ENV}', force: true)
+                        s3Download(file: "/tmp/${KEY_BACKUP_ENV}", bucket: 'sellia-backups', path: "${KEY_BACKUP_ENV}", force: true)
                     }
                 }
             }
