@@ -8,6 +8,14 @@ pipeline {
     }
 
     stages {
+        stage('Prepare env') {
+            steps {
+                script {
+                    sh 'apt-get install mongodb-database-tools -y'
+                }
+            }
+        }
+
         stage('Download backup') {
             steps {
                 script {
