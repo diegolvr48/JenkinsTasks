@@ -1,19 +1,31 @@
 pipeline {
-    stage('Download backup') {
-        withAWS(credentials: 'awscredentials') {
-            s3Download(file: KEY_BACKUP_ENV, bucket: 'backups', path:'~/backups')
+    agent any
+
+    parameters {
+        string(name: 'KEY_BACKUP_ENV', defaultValue: 'hey.zip', description: '')
+        string(name: 'MONGO_HOST', defaultValue: 'develop.uf9uoog.mongodb.net', description: '')
+        string(name: 'MONGO_USER', defaultValue: 'heyDev', description: '')
+        string(name: 'MONGO_PASSWORD', defaultValue: '', description: '')
+        string(name: 'MONGO_DB', defaultValue: 'hey-dev', description: '')
+    }
+
+    stages {
+        stage('Download backup') {
+            withAWS(credentials: 'awscredentials') {
+                s3Download(file: KEY_BACKUP_ENV, bucket: 'backups', path:'~/backups')
+            }
         }
-    }
 
-    stage('unzip backup') {
-      sh 'unzip ~/backups/${KEY_BACKUP_ENV}'
-    }
+        stage('unzip backup') {
+        sh 'unzip ~/backups/${KEY_BACKUP_ENV}'
+        }
 
-    stage('restore') {
-      sh 'mongorestore --uri="${MONGO_HOST}" --db=${MONGO_DB} ~/backups --gzip'
-    }
+        stage('restore') {
+        sh 'mongorestore --uri="mongodb-srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" --db=${MONGO_DB} ~/backups/ --gzip'
+        }
 
-    stage('Delete backup') {
-      sh 'rm -r ~/backups'
+        stage('Delete backup') {
+        sh 'rm -r ~/backups'
+        }
     }
 }
