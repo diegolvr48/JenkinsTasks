@@ -52,9 +52,15 @@ pipeline {
         stage('Delete backup') {
             steps {
                 script {
-                    sh 'rm -r /tmp/${KEY_BACKUP_ENV} /tmp/${FOLDER_UNZIP_BACKUP}'
+                    
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            sh 'rm -r /tmp/${KEY_BACKUP_ENV} /tmp/${FOLDER_UNZIP_BACKUP} | true' 
         }
     }
 }

@@ -7,6 +7,10 @@ pipeline {
         string(name: 'MONGO_HOST', defaultValue: 'develop.uf9uoog.mongodb.net', description: '')
     }
 
+    environment {
+        FOLDER_BACKUP = new Date().format("yyyyMMddHHmmss")
+    }
+
     stages {
         stage('Prepare env') {
             steps {
@@ -28,8 +32,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'mongodbuser', passwordVariable: 'MONGO_PASSWORD', usernameVariable: 'MONGO_USER')]) {
                     script {
-                        sh 'mongodump --uri="mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" -o=/tmp/ --gzip'
-                        sh 'zip -rj /tmp/${KEY_BACKUP_ENV} /tmp/${MONGO_DB}'
+                        sh 'mongodump --uri="mongodb+srv://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}/${MONGO_DB}?retryWrites=true&w=majority" -o=/tmp/${FOLDER_BACKUP} --gzip'
+                        sh 'zip -rj /tmp/${FOLDER_BACKUP}_${KEY_BACKUP_ENV} /tmp/${FOLDER_BACKUP}/${MONGO_DB}'
                     }
                 }
             }
@@ -39,18 +43,16 @@ pipeline {
             steps {
                 script {
                     withAWS(credentials: 'awscredentials', region: 'us-east-2') {
-                        s3Upload(file: "/tmp/${KEY_BACKUP_ENV}", bucket: 'sellia-backups', path: "${KEY_BACKUP_ENV}", force: true)
+                        s3Upload(file: "/tmp/${FOLDER_BACKUP}_${KEY_BACKUP_ENV}", bucket: 'sellia-backups', path: "${MONGO_DB}/${FOLDER_BACKUP}_${KEY_BACKUP_ENV}")
                     }
                 }
             }
         }
+    }
 
-        stage('Delete backup') {
-            steps {
-                script {
-                    sh 'rm -r /tmp/${KEY_BACKUP_ENV} /tmp/${MONGO_DB}'
-                }
-            }
+    post {
+        always {
+            sh 'rm -r /tmp/${FOLDER_BACKUP}_${KEY_BACKUP_ENV} /tmp/${FOLDER_BACKUP} | true'
         }
     }
 }
