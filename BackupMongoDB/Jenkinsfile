@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     withAWS(credentials: 'awscredentials', region: 'us-east-2') {
-                        s3Upload(file: "/tmp/${FOLDER_BACKUP}_${KEY_BACKUP_ENV}", bucket: 'sellia-backups', path: "${MONGO_DB}/${FOLDER_BACKUP}_${KEY_BACKUP_ENV}")
+                        s3Upload(file: "/tmp/${FOLDER_BACKUP}_${KEY_BACKUP_ENV}", bucket: 'sellia-backups', path: "${KEY_BACKUP_ENV}")
                     }
                 }
             }
